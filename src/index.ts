@@ -3,6 +3,8 @@ import * as r from 'readline'
 
 class HelloW {
     public static main(): number {
+        console.log(process.version);
+
         console.log("Hello World!");
         let reader = r.createInterface({
             input: process.stdin,
