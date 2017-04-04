@@ -7,5 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Colin Kennedy",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^3.1.8"
+  }
 }
