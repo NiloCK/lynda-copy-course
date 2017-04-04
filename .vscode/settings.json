@@ -1,5 +1,17 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "editor.codeLens": true,
-    "typescript.referencesCodeLens.enabled": true
+    "typescript.referencesCodeLens.enabled": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/*.js": {
+            "when": "$(basename).ts"
+        },
+        "**/*.js.map": {
+            "when": "$(basename).ts"
+        }
+    }
 }
