@@ -10,7 +10,7 @@
         "**/*.js": {
             "when": "$(basename).ts"
         },
-        "**/*.js.map": {
+        "**/*.js.map": { //todo - this is broken
             "when": "$(basename).ts"
         }
     }
