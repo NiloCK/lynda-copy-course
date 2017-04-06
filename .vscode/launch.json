@@ -9,7 +9,11 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceRoot}\\src\\index.js",
-            "sourceMaps": true
+            "sourceMaps": true,
+            "args": [
+                "testData\\source",
+                "testData\\dest"
+            ]
         },
         {
             "type": "node",
