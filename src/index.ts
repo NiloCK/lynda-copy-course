@@ -4,17 +4,10 @@ import * as sqlite3 from 'sqlite3'
 
 class Main {
     public static main(): number {
-        // check for src and dest args
-        console.log(`Arglength: ${process.argv.length}`);
-        process.argv.forEach((value, index) => {
-            console.log(`Arg ${index}: ${value}`);
-        })
-
-
-
+        // validate input
         try {
-            directoryIsALyndaFolder(process.argv[2])
-            directoryIsALyndaFolder(process.argv[3])
+            Main.directoryIsALyndaFolder(process.argv[2])
+            Main.directoryIsALyndaFolder(process.argv[3])
         } catch (err) {
             console.log(err);
             process.abort();
@@ -40,66 +33,50 @@ class Main {
             "Author", "Chapter", "Course", "Video"
         ]
 
-
         tables.forEach((table) => {
             console.log(`Copying ${table} table`);
 
-            sourceDB.each(`select * from ${table}`, (error, row) => {
-                console.log(row);
-                let sql: string = `insert into ${table} (${objectKeys(row)}) values (\"${objectVals(row)}\")`;
-                destDB.run(sql)
+            sourceDB.serialize(() => {
+                sourceDB.each(`select * from ${table}`, (error, row) => {
+                    console.log(row);
+                    const keys = Object.keys(row); // ['column1', 'column2']
+                    const columns = keys.toString(); // 'column1,column2'
+                    let parameters = {};
+                    let values = '';
+
+                    // Generate values and named parameters
+                    Object.keys(row).forEach((r) => {
+                        var key = '$' + r;
+                        // Generates '$column1,$column2'
+                        values = Object.keys(row).indexOf(r) === 0 ? key : values.concat(',', key);
+                        // Generates { $column1: 'foo', $column2: 'bar' }
+                        parameters[key] = row[r];
+                    });
+
+                    // SQL: insert into OneTable (column1,column2) values ($column1,$column2)
+                    // Parameters: { $column1: 'foo', $column2: 'bar' }
+                    destDB.run(`insert into ${table} (${columns}) values (${values})`, parameters);
+                })
             })
         })
-
-        sourceDB.each("select * from Author", function (err, row) {
-
-            // console.log(row);
-        })
-
-        function objectVals(obj: object): string {
-            let ret = ""
-
-            //let code = "let ret = \"\""
-            let code = "ret += obj[\""
-            code += Object.getOwnPropertyNames(obj).join('\"]; ret += "\", \""; ret += obj[\"')
-            code += "\"];"
-
-            eval(code)
-
-            return ret;
-        }
-
-        function objectKeys(obj: Object): string {
-            return Object.getOwnPropertyNames(obj).join(', ')
-        }
-
-        function jsonToSQL(data: Object): string {
-            let ret: string = "";
-            let keys = Object.getOwnPropertyNames(data)
-
-            for (var i = 0; i < keys.length - 1; i++) {
-                ret += keys[i] + ' = ' + data[keys[i]] + ', ';
-            }
-            ret += keys[keys.length - 1] + ' = ' + data[keys[keys.length - 1]]
-
-            return ret;
-        }
-
-        function directoryIsALyndaFolder(dir: string): void {
-            let good: boolean = fs.statSync(dir).isDirectory();
-            console.log(good);
-
-            fs.exists(path.join(dir, "db.sqlite"), (exists) => {
-                good = exists;
-            })
-
-            if (!good) {
-                throw new Error(`Arg ${dir} is not recogized as a Lynda directory.`)
-            }
-        }
 
         return 0;
+
     }
+    static directoryIsALyndaFolder(dir: string): void {
+        let good: boolean = fs.statSync(dir).isDirectory();
+        console.log(good);
+
+        fs.exists(path.join(dir, "db.sqlite"), (exists) => {
+            good = exists;
+        })
+
+        if (!good) {
+            throw new Error(`Arg ${dir} is not recogized as a Lynda directory.`)
+        }
+    }
+
+
 }
 
 Main.main();
