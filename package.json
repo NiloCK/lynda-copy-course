@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A utility for copying downloaded Lynda.com courses from one machine to another",
   "bin": {
-    "lynda-copy-course": "./bin/index.js"
+    "lynda-copy-course": "./bin/lynda-copy-course"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
