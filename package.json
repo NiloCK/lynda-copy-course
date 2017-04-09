@@ -1,8 +1,10 @@
 {
-  "name": "lynda-copy-course-util",
+  "name": "lynda-copy-course",
   "version": "1.0.0",
   "description": "A utility for copying downloaded Lynda.com courses from one machine to another",
-  "main": "./dist/index.js",
+  "bin": {
+    "lynda-copy-course": "./bin/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./dist/index.js"
