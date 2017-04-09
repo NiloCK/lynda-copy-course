@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as sqlite3 from 'sqlite3'
+import { ncp } from 'ncp'
 
 class Main {
     public static main(): number {
@@ -59,6 +60,19 @@ class Main {
                 })
             })
         })
+
+        sourceDir = path.join(sourceDir + "/offline");
+        destDir = path.join(destDir + "/offline");
+
+        ncp(sourceDir, destDir, {
+            "clobber": false
+        }, (err) => {
+            if (err) {
+                console.log(err.message);
+            }
+            console.log("Copying complete.")
+        });
+
 
         return 0;
 
