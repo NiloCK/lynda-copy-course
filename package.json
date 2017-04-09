@@ -9,6 +9,7 @@
   "author": "Colin Kennedy",
   "license": "MIT",
   "dependencies": {
+    "ncp": "^2.0.0",
     "sqlite3": "^3.1.8"
   }
 }
