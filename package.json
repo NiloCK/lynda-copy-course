@@ -1,7 +1,7 @@
 {
   "name": "lynda-copy-course-util",
   "version": "1.0.0",
-  "description": "A utility for moving downloaded Lynda.com courses from one installation of the software to another",
+  "description": "A utility for moving downloaded Lynda.com courses from one machine to another",
   "main": "./dist/tsc.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
