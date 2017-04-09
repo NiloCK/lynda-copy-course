@@ -35,11 +35,11 @@ class Main {
         ]
 
         tables.forEach((table) => {
-            console.log(`Copying ${table} table`);
+            // console.log(`Copying ${table} table`);
 
             sourceDB.serialize(() => {
                 sourceDB.each(`select * from ${table}`, (error, row) => {
-                    console.log(row);
+                    // console.log(row);
                     const keys = Object.keys(row); // ['column1', 'column2']
                     const columns = keys.toString(); // 'column1,column2'
                     let parameters = {};
