@@ -1,10 +1,11 @@
 {
   "name": "lynda-copy-course-util",
   "version": "1.0.0",
-  "description": "A utility for moving downloaded Lynda.com courses from one machine to another",
-  "main": "./dist/tsc.js",
+  "description": "A utility for copying downloaded Lynda.com courses from one machine to another",
+  "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./dist/index.js"
   },
   "author": "Colin Kennedy",
   "license": "MIT",
