@@ -6,13 +6,13 @@ var fs = require("fs");
 var path = require("path");
 var sqlite3 = require("sqlite3");
 var ncp_1 = require("ncp");
-var Main = (function () {
-    function Main() {
+var LyndaCourseCopier = (function () {
+    function LyndaCourseCopier() {
     }
-    Main.main = function () {
+    LyndaCourseCopier.main = function () {
         try {
-            Main.directoryIsALyndaFolder(process.argv[2]);
-            Main.directoryIsALyndaFolder(process.argv[3]);
+            LyndaCourseCopier.directoryIsALyndaFolder(process.argv[2]);
+            LyndaCourseCopier.directoryIsALyndaFolder(process.argv[3]);
         }
         catch (err) {
             console.log(err);
@@ -32,10 +32,8 @@ var Main = (function () {
             "Author", "Chapter", "Course", "Video"
         ];
         tables.forEach(function (table) {
-            console.log("Copying " + table + " table");
             sourceDB.serialize(function () {
                 sourceDB.each("select * from " + table, function (error, row) {
-                    console.log(row);
                     var keys = Object.keys(row);
                     var columns = keys.toString();
                     var parameters = {};
@@ -61,7 +59,7 @@ var Main = (function () {
         });
         return 0;
     };
-    Main.directoryIsALyndaFolder = function (dir) {
+    LyndaCourseCopier.directoryIsALyndaFolder = function (dir) {
         var good = fs.statSync(dir).isDirectory();
         console.log(good);
         fs.exists(path.join(dir, "db.sqlite"), function (exists) {
@@ -71,7 +69,8 @@ var Main = (function () {
             throw new Error("Arg " + dir + " is not recogized as a Lynda directory.");
         }
     };
-    return Main;
+    return LyndaCourseCopier;
 }());
-Main.main();
+exports["default"] = LyndaCourseCopier;
+LyndaCourseCopier.main();
 //# sourceMappingURL=index.js.map
