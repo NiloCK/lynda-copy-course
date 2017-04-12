@@ -3,12 +3,12 @@ import * as path from 'path'
 import * as sqlite3 from 'sqlite3'
 import { ncp } from 'ncp'
 
-class Main {
+export default class LyndaCourseCopier {
     public static main(): number {
         // validate input
         try {
-            Main.directoryIsALyndaFolder(process.argv[2])
-            Main.directoryIsALyndaFolder(process.argv[3])
+            LyndaCourseCopier.directoryIsALyndaFolder(process.argv[2])
+            LyndaCourseCopier.directoryIsALyndaFolder(process.argv[3])
         } catch (err) {
             console.log(err);
             process.abort();
@@ -93,4 +93,4 @@ class Main {
 
 }
 
-Main.main();
+LyndaCourseCopier.main();
