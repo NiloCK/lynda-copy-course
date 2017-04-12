@@ -15,6 +15,8 @@
   "author": "Colin Kennedy",
   "license": "MIT",
   "dependencies": {
+    "clui": "^0.3.1",
+    "count-files": "^2.6.0",
     "ncp": "^2.0.0",
     "sqlite3": "^3.1.8"
   }
