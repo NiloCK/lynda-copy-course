@@ -78,15 +78,18 @@ export default class LyndaCourseCopier {
 
     }
     static directoryIsALyndaFolder(dir: string): void {
-        let good: boolean = fs.statSync(dir).isDirectory();
-        console.log(good);
+        let isDirectory: boolean;
+        let containsSQLiteDB: boolean;
 
-        fs.exists(path.join(dir, "db.sqlite"), (exists) => {
-            good = exists;
-        })
+        isDirectory = fs.statSync(dir).isDirectory();
+        if (isDirectory) {
+            containsSQLiteDB = fs.existsSync(path.join(dir, "db.sqlite"));
+        }
 
-        if (!good) {
-            throw new Error(`Arg ${dir} is not recogized as a Lynda directory.`)
+        if (!(isDirectory && containsSQLiteDB)) {
+            throw new Error(
+                `Arg ${dir} is not a Lynda directory.
+The input directories should be folders which contain 'db.sqlite'.`)
         }
     }
 
