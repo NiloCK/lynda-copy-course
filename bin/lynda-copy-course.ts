@@ -2,4 +2,4 @@
 
 import CourseCopier from '../src/index'
 
-CourseCopier.main();
+CourseCopier.copy(process.argv[2], process.argv[3]);

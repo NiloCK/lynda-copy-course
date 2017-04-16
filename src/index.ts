@@ -3,32 +3,46 @@ import * as path from 'path'
 import * as sqlite3 from 'sqlite3'
 import { ncp } from 'ncp'
 
+let sqliteDB = (databasePath: string, access: number): sqlite3.Database => {
+    return new sqlite3.Database(
+        databasePath,
+        access,
+        (err: Error) => {
+            if (err) console.log(err.message);
+        }
+    );
+}
+
+let databasePath = (directoryPath: string): string => {
+    return path.join(directoryPath, 'db.sqlite');
+}
+
 export default class LyndaCourseCopier {
-    public static main(): number {
+    /**
+     * Copies all courses from the source directory into the destination directory.
+     * 
+     * @param sourceDir Directory containing courses to be copied
+     * @param destDir Directory to copy courses to
+     */
+    public static copy(sourceDir: string, destDir: string): number {
         // validate input
         try {
-            LyndaCourseCopier.directoryIsALyndaFolder(process.argv[2])
-            LyndaCourseCopier.directoryIsALyndaFolder(process.argv[3])
+            LyndaCourseCopier.directoryIsALyndaFolder(sourceDir)
+            LyndaCourseCopier.directoryIsALyndaFolder(destDir)
         } catch (err) {
             console.log(err);
             process.abort();
         }
 
-        let sourceDir = process.argv[2];
-        let destDir = process.argv[3];
+        let sourceDB = sqliteDB(
+            databasePath(sourceDir),
+            sqlite3.OPEN_READONLY
+        );
 
-        let sourceDB = new sqlite3.Database(
-            path.join(sourceDir, 'db.sqlite'),
-            sqlite3.OPEN_READONLY,
-            (err: Error) => {
-                if (err) console.log(err.message);
-            });
-        let destDB = new sqlite3.Database(
-            path.join(destDir, 'db.sqlite'),
-            sqlite3.OPEN_READWRITE,
-            (err: Error) => {
-                if (err) console.log(err.message)
-            })
+        let destDB = sqliteDB(
+            databasePath(destDir),
+            sqlite3.OPEN_READWRITE
+        );
 
         let tables: Array<string> = [
             "Author", "Chapter", "Course", "Video"
