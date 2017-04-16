@@ -95,5 +95,3 @@ The input directories should be folders which contain 'db.sqlite'.`)
 
 
 }
-
-LyndaCourseCopier.main();
