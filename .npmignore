@@ -1,0 +1,3 @@
+# this file is to allow compiled *.js files
+# to be included in the package, instead of being
+# ignored because of the .gitignore
