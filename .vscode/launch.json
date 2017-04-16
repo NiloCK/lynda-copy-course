@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}\\src\\index.js",
+            "program": "${workspaceRoot}\\bin\\lynda-copy-course.ts",
             "sourceMaps": true,
             "args": [
                 "testData\\source",
