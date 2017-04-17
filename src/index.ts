@@ -25,6 +25,8 @@ export default class LyndaCourseCopier {
 
     /**
      *
+     * @param sourceDir Directory containing courses to be copied
+     * @param destDir Directory to copy courses to
      */
     constructor(sourceDir: string, destDir: string) {
         try {
@@ -51,9 +53,6 @@ export default class LyndaCourseCopier {
 
     /**
      * Copies all courses from the source directory into the destination directory.
-     * 
-     * @param sourceDir Directory containing courses to be copied
-     * @param destDir Directory to copy courses to
      */
     public copy(): number {
         // validate input
