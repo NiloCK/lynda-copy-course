@@ -21,12 +21,16 @@ const courseList = (database: sqlite3.Database): Course[] => {
     let ret = new Array<Course>();
 
     database.serialize();
-    database.each("select ID, Title from Course", (err: Error, row: Object) => {
-        ret.push(new Course(
-            row.ID,
-            row.Title
-        ))
-    })
+    database.each("select ID, Title from Course",
+        (err: Error, row: Object) => {
+            ret.push(new Course(
+                row.ID,
+                row.Title
+            ))
+        },
+        (err: Error, count: number) => {
+            console.log(`There are ${ret.length} source courses`)
+        })
 
     return ret;
 }
@@ -81,7 +85,7 @@ export default class LyndaCourseCopier {
         );
 
         this.sourceCourses = courseList(this.sourceDB);
-        this.destCourses = courseList(this.destDB);
+        //this.destCourses = courseList(this.destDB);
     }
 
 

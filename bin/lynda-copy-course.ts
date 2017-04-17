@@ -9,5 +9,4 @@ let destDir: string = args._[1];
 let copier = new CourseCopier(sourceDir, destDir);
 
 // copier.copy();
-console.log(copier.sourceCourses.length)
-console.log(copier.destCourses.length)
+console.log(`there are ${copier.sourceCourses.length} source courses`) // should be 6
