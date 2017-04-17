@@ -3,7 +3,7 @@ import * as path from 'path'
 import * as sqlite3 from 'sqlite3'
 import { ncp } from 'ncp'
 
-let sqliteDB = (databasePath: string, access: number): sqlite3.Database => {
+const sqliteDB = (databasePath: string, access: number): sqlite3.Database => {
     return new sqlite3.Database(
         databasePath,
         access,
@@ -13,8 +13,36 @@ let sqliteDB = (databasePath: string, access: number): sqlite3.Database => {
     );
 }
 
-let databasePath = (directoryPath: string): string => {
+const databasePath = (directoryPath: string): string => {
     return path.join(directoryPath, 'db.sqlite');
+}
+
+const courseList = (database: sqlite3.Database): Course[] => {
+    let ret = new Array<Course>();
+
+    database.serialize();
+    database.each("select ID, Title from Course", (err: Error, row: Object) => {
+        ret.push(new Course(
+            row.ID,
+            row.Title
+        ))
+    })
+
+    return ret;
+}
+
+class Course {
+    title: string;
+    id: number;
+
+    constructor(id: number, title: string) {
+        this.id = id;
+        this.title = title;
+    }
+
+    toString(): string {
+        return this.title;
+    }
 }
 
 export default class LyndaCourseCopier {
@@ -22,6 +50,9 @@ export default class LyndaCourseCopier {
     private destDir: string;
     private sourceDB: sqlite3.Database;
     private destDB: sqlite3.Database;
+
+    sourceCourses: Array<Course>;
+    destCourses: Array<Course>;
 
     /**
      *
@@ -48,11 +79,14 @@ export default class LyndaCourseCopier {
             databasePath(destDir),
             sqlite3.OPEN_READWRITE
         );
+
+        this.sourceCourses = courseList(this.sourceDB);
+        this.destCourses = courseList(this.destDB);
     }
 
 
     /**
-     * Copies all courses from the source directory into the destination directory.
+     * Copies ALL courses from the source directory into the destination directory.
      */
     public copy(): number {
         // validate input
