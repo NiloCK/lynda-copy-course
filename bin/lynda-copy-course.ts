@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
 import CourseCopier from '../src/index'
+import * as minimist from 'minimist'
 
-CourseCopier.copy(process.argv[2], process.argv[3]);
+let args = minimist(process.argv.slice(2));
+let sourceDir: string = args._[0];
+let destDir: string = args._[1];
+
+CourseCopier.copy(sourceDir, destDir);

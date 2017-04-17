@@ -16,6 +16,7 @@
   "author": "Colin Kennedy",
   "license": "MIT",
   "dependencies": {
+    "minimist": "^1.2.0",
     "ncp": "^2.0.0",
     "sqlite3": "^3.1.8"
   }
