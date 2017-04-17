@@ -8,4 +8,6 @@ let sourceDir: string = args._[0];
 let destDir: string = args._[1];
 let copier = new CourseCopier(sourceDir, destDir);
 
-copier.copy();
+// copier.copy();
+console.log(copier.sourceCourses.length)
+console.log(copier.destCourses.length)
