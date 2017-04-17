@@ -18,14 +18,15 @@ let databasePath = (directoryPath: string): string => {
 }
 
 export default class LyndaCourseCopier {
+    private sourceDir: string;
+    private destDir: string;
+    private sourceDB: sqlite3.Database;
+    private destDB: sqlite3.Database;
+
     /**
-     * Copies all courses from the source directory into the destination directory.
-     * 
-     * @param sourceDir Directory containing courses to be copied
-     * @param destDir Directory to copy courses to
+     *
      */
-    public static copy(sourceDir: string, destDir: string): number {
-        // validate input
+    constructor(sourceDir: string, destDir: string) {
         try {
             LyndaCourseCopier.directoryIsALyndaFolder(sourceDir)
             LyndaCourseCopier.directoryIsALyndaFolder(destDir)
@@ -34,15 +35,28 @@ export default class LyndaCourseCopier {
             process.abort();
         }
 
-        let sourceDB = sqliteDB(
+        this.sourceDir = sourceDir;
+        this.destDir = destDir;
+
+        this.sourceDB = sqliteDB(
             databasePath(sourceDir),
             sqlite3.OPEN_READONLY
         );
-
-        let destDB = sqliteDB(
+        this.destDB = sqliteDB(
             databasePath(destDir),
             sqlite3.OPEN_READWRITE
         );
+    }
+
+
+    /**
+     * Copies all courses from the source directory into the destination directory.
+     * 
+     * @param sourceDir Directory containing courses to be copied
+     * @param destDir Directory to copy courses to
+     */
+    public copy(): number {
+        // validate input
 
         let tables: Array<string> = [
             "Author", "Chapter", "Course", "Video"
@@ -51,8 +65,8 @@ export default class LyndaCourseCopier {
         tables.forEach((table) => {
             // console.log(`Copying ${table} table`);
 
-            sourceDB.serialize(() => {
-                sourceDB.each(`select * from ${table}`, (error, row) => {
+            this.sourceDB.serialize(() => {
+                this.sourceDB.each(`select * from ${table}`, (error, row) => {
                     // console.log(row);
                     const keys = Object.keys(row); // ['column1', 'column2']
                     const columns = keys.toString(); // 'column1,column2'
@@ -70,15 +84,15 @@ export default class LyndaCourseCopier {
 
                     // SQL: insert into OneTable (column1,column2) values ($column1,$column2)
                     // Parameters: { $column1: 'foo', $column2: 'bar' }
-                    destDB.run(`insert into ${table} (${columns}) values (${values})`, parameters);
+                    this.destDB.run(`insert into ${table} (${columns}) values (${values})`, parameters);
                 })
             })
         })
 
-        sourceDir = path.join(sourceDir + "/offline");
-        destDir = path.join(destDir + "/offline");
+        let filesSourceDir = path.join(this.sourceDir + "/offline");
+        let filesDestDir = path.join(this.destDir + "/offline");
 
-        ncp(sourceDir, destDir, {
+        ncp(filesSourceDir, filesDestDir, {
             "clobber": false
         }, (err) => {
             if (err) {

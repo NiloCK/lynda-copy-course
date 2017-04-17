@@ -6,5 +6,6 @@ import * as minimist from 'minimist'
 let args = minimist(process.argv.slice(2));
 let sourceDir: string = args._[0];
 let destDir: string = args._[1];
+let copier = new CourseCopier(sourceDir, destDir);
 
-CourseCopier.copy(sourceDir, destDir);
+copier.copy();
