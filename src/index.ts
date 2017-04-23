@@ -17,22 +17,23 @@ const databasePath = (directoryPath: string): string => {
     return path.join(directoryPath, 'db.sqlite');
 }
 
-const courseList = (database: sqlite3.Database): Course[] => {
+const courseList = (database: sqlite3.Database, list: Course[]) => {
     let ret = new Array<Course>();
 
     database.serialize();
-    database.each("select ID, Title from Course",
-        (err: Error, row: Object) => {
-            ret.push(new Course(
-                row.ID,
-                row.Title
-            ))
-        },
-        (err: Error, count: number) => {
-            console.log(`There are ${ret.length} source courses`)
-        })
+    database.all("select ID, Title from Course",
+        (err: Error, rows: any[]) => {
+            rows.forEach((row) => {
+                list.push(
+                    new Course(
+                        row.ID,
+                        row.Title
+                    )
+                )
+            })
+        }
+    )
 
-    return ret;
 }
 
 class Course {
@@ -83,9 +84,13 @@ export default class LyndaCourseCopier {
             databasePath(destDir),
             sqlite3.OPEN_READWRITE
         );
+        this.sourceCourses = [];
+        this.destCourses = [];
 
-        this.sourceCourses = courseList(this.sourceDB);
-        //this.destCourses = courseList(this.destDB);
+        courseList(this.sourceDB, this.sourceCourses);
+        courseList(this.destDB, this.destCourses);
+        // console.log(this.sourceCourses.length);
+        // this.destCourses = courseList(this.destDB);
     }
 
 
