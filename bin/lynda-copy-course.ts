@@ -10,13 +10,19 @@ let copier = new CourseCopier(sourceDir, destDir);
 
 function wait() {
     if (!copier.isReady()) {
-        console.log("waiting... ???");
+        console.log("Reading database info...");
         setTimeout(wait, 50);
     } else {
         console.log("Done");
-        console.log(`there are ${copier.sourceDir.courses.length} source courses`) // should be 6
-        console.log(`there are ${copier.destDir.courses.length} destination courses`) // should be 0
-        // copier.copy();
+        console.log(`there are ${copier.sourceDir.courses.length} source courses:`)
+        copier.sourceDir.courses.forEach((course, i) => {
+            console.log(`Id: ${course.id}\tTitle: ${course.title}`);
+        })
+        console.log(`there are ${copier.destDir.courses.length} destination courses:`)
+        copier.destDir.courses.forEach((course, i) => {
+            console.log(`Id: ${course.id}\tTitle: ${course.title}`);
+        })
+        copier.copy();
     }
 }
 
