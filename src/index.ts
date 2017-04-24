@@ -41,6 +41,18 @@ class LyndaDirectory {
 
         this.attachDB(access);
         this.populateCourses();
+
+        if (access === sqlite3.OPEN_READWRITE) {
+            this.initializeOutputDirectories();
+        }
+    }
+    private initializeOutputDirectories() {
+        try { fs.mkdirSync(path.join(this.directory, "offline")) } catch (e) {
+            // console.log(e);
+        };
+        try { fs.mkdirSync(path.join(this.directory, "offline/", "ldc-dl-courses")) } catch (e) {
+            // console.log(e);
+        }
     }
 
     private waitFor(cb: Function = () => { }) {
@@ -164,18 +176,11 @@ export default class LyndaCourseCopier {
             }
         )
 
-        try { fs.mkdirSync(path.join(this.destDir.dir(), "offline")) } catch (e) {
-            console.log(e);
-        };
-        try { fs.mkdirSync(path.join(this.destDir.dir(), "offline/", "ldc-dl-courses")) } catch (e) {
-            console.log(e);
-        }
         try {
             fs.mkdirSync(this.destDir.getCoursePath(courseID));
         } catch (e) {
             console.log(e);
         }
-
 
         ncp(this.sourceDir.getCoursePath(courseID),
             this.destDir.getCoursePath(courseID), {
