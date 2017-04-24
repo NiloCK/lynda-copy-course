@@ -32,7 +32,7 @@ class LyndaDirectory {
      */
     constructor(directory: string, access: number) {
         try {
-            LyndaCourseCopier.directoryIsALyndaFolder(directory);
+            LyndaDirectory.directoryIsALyndaFolder(directory);
         } catch (err) {
             console.log(err);
             process.exit(1);
@@ -117,6 +117,21 @@ class LyndaDirectory {
             this.setReady.bind(this, true)
         )
 
+    }
+    static directoryIsALyndaFolder(dir: string): void {
+        let isDirectory: boolean;
+        let containsSQLiteDB: boolean;
+
+        isDirectory = fs.statSync(dir).isDirectory();
+        if (isDirectory) {
+            containsSQLiteDB = fs.existsSync(path.join(dir, "db.sqlite"));
+        }
+
+        if (!(isDirectory && containsSQLiteDB)) {
+            throw new Error(
+                `Arg ${dir} is not a Lynda directory.
+The input directories should be folders which contain 'db.sqlite'.`)
+        }
     }
 
 }
@@ -216,21 +231,4 @@ export default class LyndaCourseCopier {
         // Parameters: { $column1: 'foo', $column2: 'bar' }
         this.destDir.db.run(`insert into ${tableName} (${columns}) values (${values})`, parameters);
     }
-    static directoryIsALyndaFolder(dir: string): void {
-        let isDirectory: boolean;
-        let containsSQLiteDB: boolean;
-
-        isDirectory = fs.statSync(dir).isDirectory();
-        if (isDirectory) {
-            containsSQLiteDB = fs.existsSync(path.join(dir, "db.sqlite"));
-        }
-
-        if (!(isDirectory && containsSQLiteDB)) {
-            throw new Error(
-                `Arg ${dir} is not a Lynda directory.
-The input directories should be folders which contain 'db.sqlite'.`)
-        }
-    }
-
-
 }
