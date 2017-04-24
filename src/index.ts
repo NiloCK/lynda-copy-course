@@ -63,7 +63,11 @@ class LyndaDirectory {
         //this.waitFor();
     }
 
-    databasePath(): string {
+    public getCoursePath(id: number) {
+        return path.join(this.directory, 'offline/ldc-dl-courses/', id.toString());
+    }
+
+    private databasePath(): string {
         return path.join(this.directory, 'db.sqlite');
     }
 
@@ -128,53 +132,84 @@ export default class LyndaCourseCopier {
     /**
      * Copies ALL courses from the source directory into the destination directory.
      */
-    public copy(): number {
-        // validate input
+    public copy(courseID: number = 0): number {
+        let ret = 0;
+
+        if (courseID === 0) {
+            this.sourceDir.courses.forEach(
+                (course, index) => this.copy.bind(this, course.id)()
+            )
+
+            return ret;
+        }
 
         let tables: Array<string> = [
-            "Author", "Chapter", "Course", "Video"
+            "Author", "Chapter", "Video"
         ]
 
         tables.forEach((table) => {
             // console.log(`Copying ${table} table`);
 
             this.sourceDir.db.serialize(() => {
-                this.sourceDir.db.each(`select * from ${table}`, (error, row) => {
-                    // console.log(row);
-                    const keys = Object.keys(row); // ['column1', 'column2']
-                    const columns = keys.toString(); // 'column1,column2'
-                    let parameters = {};
-                    let values = '';
-
-                    // Generate values and named parameters
-                    Object.keys(row).forEach((r) => {
-                        var key = '$' + r;
-                        // Generates '$column1,$column2'
-                        values = Object.keys(row).indexOf(r) === 0 ? key : values.concat(',', key);
-                        // Generates { $column1: 'foo', $column2: 'bar' }
-                        parameters[key] = row[r];
-                    });
-
-                    // SQL: insert into OneTable (column1,column2) values ($column1,$column2)
-                    // Parameters: { $column1: 'foo', $column2: 'bar' }
-                    this.destDir.db.run(`insert into ${table} (${columns}) values (${values})`, parameters);
-                })
+                this.sourceDir.db.each(`select * from ${table} where CourseId = ${courseID}`,
+                    (error: Error, row: any) => {
+                        this.copyDatabaseRow.bind(this, error, row, table)();
+                    })
             })
         })
 
-        let filesSourceDir = path.join(this.sourceDir.dir() + "/offline");
-        let filesDestDir = path.join(this.destDir.dir() + "/offline");
-
-        ncp(filesSourceDir, filesDestDir, {
-            "clobber": false
-        }, (err) => {
-            if (err) {
-                console.log(err.message);
+        this.sourceDir.db.each(`select * from Course where ID = ${courseID}`,
+            (error: Error, row: any) => {
+                this.copyDatabaseRow.bind(this, error, row, 'Course')();
             }
-            console.log("Copying complete.")
-        });
+        )
+
+        try { fs.mkdirSync(path.join(this.destDir.dir(), "offline")) } catch (e) {
+            console.log(e);
+        };
+        try { fs.mkdirSync(path.join(this.destDir.dir(), "offline/", "ldc-dl-courses")) } catch (e) {
+            console.log(e);
+        }
+        try {
+            fs.mkdirSync(this.destDir.getCoursePath(courseID));
+        } catch (e) {
+            console.log(e);
+        }
+
+
+        ncp(this.sourceDir.getCoursePath(courseID),
+            this.destDir.getCoursePath(courseID), {
+                "clobber": false,
+            },
+            (err) => {
+                if (err) {
+                    console.log(`Error copying course ${courseID}: ${err}`);
+                } else {
+                    console.log(`Finished copying course ${courseID}.`)
+                }
+            });
 
         return 0;
+    }
+
+    copyDatabaseRow(err: Error, row: any, tableName: string) {
+        const keys = Object.keys(row); // ['column1', 'column2']
+        const columns = keys.toString(); // 'column1,column2'
+        let parameters = {};
+        let values = '';
+
+        // Generate values and named parameters
+        Object.keys(row).forEach((r) => {
+            var key = '$' + r;
+            // Generates '$column1,$column2'
+            values = Object.keys(row).indexOf(r) === 0 ? key : values.concat(',', key);
+            // Generates { $column1: 'foo', $column2: 'bar' }
+            parameters[key] = row[r];
+        });
+
+        // SQL: insert into OneTable (column1,column2) values ($column1,$column2)
+        // Parameters: { $column1: 'foo', $column2: 'bar' }
+        this.destDir.db.run(`insert into ${tableName} (${columns}) values (${values})`, parameters);
     }
     static directoryIsALyndaFolder(dir: string): void {
         let isDirectory: boolean;
