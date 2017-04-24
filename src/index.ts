@@ -55,12 +55,6 @@ class LyndaDirectory {
         }
     }
 
-    private waitFor(cb: Function = () => { }) {
-        cb();
-        if (!this.isReady()) {
-            setTimeout(this.waitFor(cb), 50);
-        }
-    }
     private attachDB(access: number) {
         //this.ready = false;
 
@@ -81,13 +75,6 @@ class LyndaDirectory {
 
     private databasePath(): string {
         return path.join(this.directory, 'db.sqlite');
-    }
-
-    /**
-     * Returns the path of the directory.
-     */
-    dir(): string {
-        return this.directory;
     }
 
     isReady(): boolean {
