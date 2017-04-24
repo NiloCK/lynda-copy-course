@@ -3,39 +3,6 @@ import * as path from 'path'
 import * as sqlite3 from 'sqlite3'
 import { ncp } from 'ncp'
 
-const sqliteDB = (databasePath: string, access: number): sqlite3.Database => {
-    return new sqlite3.Database(
-        databasePath,
-        access,
-        (err: Error) => {
-            if (err) console.log(err.message);
-        }
-    );
-}
-
-const databasePath = (directoryPath: string): string => {
-    return path.join(directoryPath, 'db.sqlite');
-}
-
-const courseList = (database: sqlite3.Database, list: Course[]) => {
-    let ret = new Array<Course>();
-
-    database.serialize();
-    database.all("select ID, Title from Course",
-        (err: Error, rows: any[]) => {
-            rows.forEach((row) => {
-                list.push(
-                    new Course(
-                        row.ID,
-                        row.Title
-                    )
-                )
-            })
-        }
-    )
-
-}
-
 class Course {
     title: string;
     id: number;
@@ -50,14 +17,98 @@ class Course {
     }
 }
 
-export default class LyndaCourseCopier {
-    private sourceDir: string;
-    private destDir: string;
-    private sourceDB: sqlite3.Database;
-    private destDB: sqlite3.Database;
+class LyndaDirectory {
+    private ready: boolean = false;
+    private directory: string;
+    db: sqlite3.Database;
 
-    sourceCourses: Array<Course>;
-    destCourses: Array<Course>;
+    courses: Array<Course>;
+
+    /**
+     * Creates an object representation of the lynda course data in a given directory.
+     * 
+     * @param access the read/write accessibilite from sqlite3:
+     *        sqlite3.OPEN_CREATE, ...OPEN_READONLY, ...OPEN_READWRITE
+     */
+    constructor(directory: string, access: number) {
+        try {
+            LyndaCourseCopier.directoryIsALyndaFolder(directory);
+        } catch (err) {
+            console.log(err);
+            process.exit(1);
+        }
+        this.directory = directory;
+
+        this.attachDB(access);
+        this.populateCourses();
+    }
+
+    private waitFor(cb: Function = () => { }) {
+        cb();
+        if (!this.isReady()) {
+            setTimeout(this.waitFor(cb), 50);
+        }
+    }
+    private attachDB(access: number) {
+        //this.ready = false;
+
+        this.db = new sqlite3.Database(
+            this.databasePath(),
+            access,
+            (err: Error) => {
+                if (err) console.log(err.message);
+            }
+        );
+
+        //this.waitFor();
+    }
+
+    databasePath(): string {
+        return path.join(this.directory, 'db.sqlite');
+    }
+
+    /**
+     * Returns the path of the directory.
+     */
+    dir(): string {
+        return this.directory;
+    }
+
+    isReady(): boolean {
+        return (this.ready);
+    }
+
+    private setReady(val: boolean) {
+        this.ready = val;
+    }
+
+    populateCourses() {
+        this.ready = false;
+        this.courses = new Array<Course>();
+
+        this.db.each("select ID, Title from Course",
+            (function (err: Error, row: any) {
+                if (err) {
+                    console.log(err);
+                }
+                this.courses.push(
+                    new Course(
+                        row.ID,
+                        row.Title
+                    )
+                )
+            }).bind(this),
+            this.setReady.bind(this, true)
+        )
+
+    }
+
+}
+
+export default class LyndaCourseCopier {
+
+    sourceDir: LyndaDirectory;
+    destDir: LyndaDirectory;
 
     /**
      *
@@ -65,32 +116,12 @@ export default class LyndaCourseCopier {
      * @param destDir Directory to copy courses to
      */
     constructor(sourceDir: string, destDir: string) {
-        try {
-            LyndaCourseCopier.directoryIsALyndaFolder(sourceDir)
-            LyndaCourseCopier.directoryIsALyndaFolder(destDir)
-        } catch (err) {
-            console.log(err);
-            process.abort();
-        }
+        this.sourceDir = new LyndaDirectory(sourceDir, sqlite3.OPEN_READONLY);
+        this.destDir = new LyndaDirectory(destDir, sqlite3.OPEN_READWRITE);
+    }
 
-        this.sourceDir = sourceDir;
-        this.destDir = destDir;
-
-        this.sourceDB = sqliteDB(
-            databasePath(sourceDir),
-            sqlite3.OPEN_READONLY
-        );
-        this.destDB = sqliteDB(
-            databasePath(destDir),
-            sqlite3.OPEN_READWRITE
-        );
-        this.sourceCourses = [];
-        this.destCourses = [];
-
-        courseList(this.sourceDB, this.sourceCourses);
-        courseList(this.destDB, this.destCourses);
-        // console.log(this.sourceCourses.length);
-        // this.destCourses = courseList(this.destDB);
+    isReady(): boolean {
+        return (this.sourceDir.isReady() && this.destDir.isReady());
     }
 
 
@@ -107,8 +138,8 @@ export default class LyndaCourseCopier {
         tables.forEach((table) => {
             // console.log(`Copying ${table} table`);
 
-            this.sourceDB.serialize(() => {
-                this.sourceDB.each(`select * from ${table}`, (error, row) => {
+            this.sourceDir.db.serialize(() => {
+                this.sourceDir.db.each(`select * from ${table}`, (error, row) => {
                     // console.log(row);
                     const keys = Object.keys(row); // ['column1', 'column2']
                     const columns = keys.toString(); // 'column1,column2'
@@ -126,13 +157,13 @@ export default class LyndaCourseCopier {
 
                     // SQL: insert into OneTable (column1,column2) values ($column1,$column2)
                     // Parameters: { $column1: 'foo', $column2: 'bar' }
-                    this.destDB.run(`insert into ${table} (${columns}) values (${values})`, parameters);
+                    this.destDir.db.run(`insert into ${table} (${columns}) values (${values})`, parameters);
                 })
             })
         })
 
-        let filesSourceDir = path.join(this.sourceDir + "/offline");
-        let filesDestDir = path.join(this.destDir + "/offline");
+        let filesSourceDir = path.join(this.sourceDir.dir() + "/offline");
+        let filesDestDir = path.join(this.destDir.dir() + "/offline");
 
         ncp(filesSourceDir, filesDestDir, {
             "clobber": false
@@ -143,9 +174,7 @@ export default class LyndaCourseCopier {
             console.log("Copying complete.")
         });
 
-
         return 0;
-
     }
     static directoryIsALyndaFolder(dir: string): void {
         let isDirectory: boolean;
