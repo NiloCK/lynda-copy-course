@@ -169,6 +169,19 @@ export default class LyndaCourseCopier {
             return;
         }
 
+        this.copyCourseDBContents(courseID);
+        this.copyCourseFiles(courseID);
+
+    }
+
+    copyCourseDBContents(courseID: number) {
+        this.sourceDir.db.each(`select * from Course where ID = ${courseID}`,
+            (error: Error, row: any) => {
+                this.copyDatabaseRow.bind(this, error, row, 'Course')();
+            }
+        )
+
+
         let tables: Array<string> = [
             "Author", "Chapter", "Video"
         ]
@@ -184,12 +197,9 @@ export default class LyndaCourseCopier {
             })
         })
 
-        this.sourceDir.db.each(`select * from Course where ID = ${courseID}`,
-            (error: Error, row: any) => {
-                this.copyDatabaseRow.bind(this, error, row, 'Course')();
-            }
-        )
+    }
 
+    copyCourseFiles(courseID: number) {
         try {
             fs.mkdirSync(this.destDir.getCoursePath(courseID));
         } catch (e) {
