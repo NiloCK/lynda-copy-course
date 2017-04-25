@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as sqlite3 from 'sqlite3'
+import * as _ from 'lodash'
 import { ncp } from 'ncp'
 
 class Course {
@@ -142,19 +143,30 @@ export default class LyndaCourseCopier {
         return (this.sourceDir.isReady() && this.destDir.isReady());
     }
 
+    /**
+     * Returns all courses eligible to be copied - courses that
+     * exist in the source directory but not in the destination
+     */
+    eligibleCourses(): Array<Course> {
+        return _.difference(this.sourceDir.courses,
+            this.destDir.courses);
+    }
+
 
     /**
-     * Copies ALL courses from the source directory into the destination directory.
+     * Copies the course with the given courseID from
+     * source directory into the destination directory.
+     * 
+     * @param courseID The id# of the course to copy. '0' to copy all courses.
      */
-    public copy(courseID: number = 0): number {
-        let ret = 0;
-
+    public copy(courseID: number = 0): void {
+        // if no id provided, copy all eligible courses
         if (courseID === 0) {
-            this.sourceDir.courses.forEach(
+            this.eligibleCourses().forEach(
                 (course, index) => this.copy.bind(this, course.id)()
             )
 
-            return ret;
+            return;
         }
 
         let tables: Array<string> = [
@@ -181,7 +193,7 @@ export default class LyndaCourseCopier {
         try {
             fs.mkdirSync(this.destDir.getCoursePath(courseID));
         } catch (e) {
-            console.log(e);
+            //console.log(e);
         }
 
         ncp(this.sourceDir.getCoursePath(courseID),
@@ -195,8 +207,6 @@ export default class LyndaCourseCopier {
                     console.log(`Finished copying course ${courseID}.`)
                 }
             });
-
-        return 0;
     }
 
     copyDatabaseRow(err: Error, row: any, tableName: string) {
