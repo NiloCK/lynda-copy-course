@@ -1,7 +1,7 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "editor.codeLens": true,
-    "typescript.referencesCodeLens.enabled": true,
+    //    "editor.codeLens": true,
+    //"typescript.referencesCodeLens.enabled": true,
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
