@@ -27,5 +27,3 @@ function wait() {
 }
 
 wait();
-
-
