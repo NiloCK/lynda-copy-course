@@ -10,6 +10,7 @@
             "name": "Launch Program",
             "program": "${workspaceRoot}\\bin\\lynda-copy-course.ts",
             "sourceMaps": true,
+            "console": "integratedTerminal",
             "args": [
                 "testData\\source",
                 "testData\\dest"
