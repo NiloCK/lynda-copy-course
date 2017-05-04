@@ -4,7 +4,7 @@ import * as sqlite3 from 'sqlite3'
 import * as _ from 'lodash'
 import { ncp } from 'ncp'
 
-class Course {
+export class Course {
     title: string;
     id: number;
 
@@ -152,6 +152,17 @@ export default class LyndaCourseCopier {
             this.destDir.courses);
     }
 
+    eligibleCoursesChoiceList(): Array<object> {
+        let ret: Array<object> = [];
+        this.eligibleCourses().forEach((course) => {
+            ret.push({
+                name: course.title,
+                value: course
+            })
+        })
+        return ret;
+    }
+
 
     /**
      * Copies the course with the given courseID from
@@ -212,11 +223,15 @@ export default class LyndaCourseCopier {
             },
             (err) => {
                 if (err) {
-                    console.log(`Error copying course ${courseID}: ${err}`);
+                    console.log(`Error copying \"${this.titleOf(courseID)}\": ${err}`);
                 } else {
-                    console.log(`Finished copying course ${courseID}.`)
+                    console.log(`Finished copying \"${this.titleOf(courseID)}\".`)
                 }
             });
+    }
+
+    titleOf(id: number) {
+        return this.eligibleCourses().filter((course) => course.id === id)[0].title;
     }
 
     copyDatabaseRow(err: Error, row: any, tableName: string) {
