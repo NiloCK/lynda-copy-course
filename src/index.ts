@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as sqlite3 from 'sqlite3'
 import * as _ from 'lodash'
+import * as inq from 'inquirer'
 import { ncp } from 'ncp'
 
 export class Course {
@@ -207,7 +208,24 @@ export default class LyndaCourseCopier {
                     })
             })
         })
+    }
 
+    /**
+     * Prompts user to select courses for copying and then copies selected courses.
+     */
+    initializeCopyDialogue() {
+        inq.prompt([
+            {
+                type: "checkbox",
+                name: "courseList",
+                message: "The following courses are available for copying. Which would you like to copy?",
+                choices: this.eligibleCoursesChoiceList()
+            }
+        ]).then((answers) => {
+            answers.courseList.forEach((course: Course) => {
+                this.copy(course.id);
+            })
+        })
     }
 
     copyCourseFiles(courseID: number) {
