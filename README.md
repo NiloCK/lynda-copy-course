@@ -1,7 +1,7 @@
 # lynda-copy-course
 A utility for copying downloaded Lynda.com courses from one machine to another.
 
-![Example usage](./Screenshot.png)
+<img src="Screenshot.png" alt="Example Usage" />
 
 ## Installation
 
