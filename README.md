@@ -1,7 +1,12 @@
 # lynda-copy-course
 A command line utility for copying downloaded Lynda.com courses from one machine to another.
 
-<img src="./Screenshot.PNG" alt="Example Usage" />
+<img src="https://raw.githubusercontent.com/nilock/lynda-copy-course/master/Screenshot.PNG" alt="Example Usage" />
+
+
+## Warning!
+
+This software is a rough cut, and has been 'tested' only on the auther's windows machine. It's probably a good idea to create a backup copy of your 'destination' folder before use.
 
 ## Installation
 
@@ -30,10 +35,6 @@ If the optional `-a` or `--all` flags are passed, all eligible courses (ones pre
 ## Why?
 My primary machine is an offline-first desktop with bandwidth restrictions. This utility lets me transfer Lynda.com courses downloaded with a laptop at my local library to my primary machine.
 
-## Warning!
-
-This software is a rough cut, and has been 'tested' on a single windows machine. It's probably a good idea to create a backup copy of your 'destination' folder before use.
-
-## A note to Lynda.com developers:
+## A note to Lynda.com developers
 
 It would be handy if the Lynda.com Desktop app checked the local disk before downloading video files. That way, users could move course files manually, and the app would only have to download meta-data and thumbnails.
