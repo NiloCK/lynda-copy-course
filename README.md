@@ -1,5 +1,7 @@
 # lynda-copy-course
-A utility for copying downloaded Lynda.com courses from one machine to another
+A utility for copying downloaded Lynda.com courses from one machine to another.
+
+![Example usage](./Screenshot.png)
 
 ## Installation
 
@@ -15,12 +17,23 @@ If npm installations are unfamiliar, Lynda.com's <a href="https://www.lynda.com/
 From the command line:
 
 ```
-lynda-copy-course D:\path\to\source\Lynda\directory C:\path\to\destination\lynda\directory
+lynda-copy-course D:\path\to\source\Lynda\directory C:\path\to\destination\lynda\directory [-a]
 ```
 
-The input directories should be the folders which contain Lynda's sqlite database file, `db.sqlite`. On Windows, this folder is located at `"~\AppData\Local\lynda.com\Lynda.com Desktop App"` by default.
+Source and destination directories are required.
 
-All courses in the source folder will be copied to the destination folder, and the destination folder's original courses will remain.
+Input directories should be the folders which contain Lynda's sqlite database file, `db.sqlite`. On Windows, this folder is located at `"~\AppData\Local\lynda.com\Lynda.com Desktop App"` by default.
+
+If the optional `-a` or `--all` flags are passed, all eligible courses (ones present in the source directory but not present in the destination directory) will be copied. Otherwise, users will be prompted to select courses for copying, as in the above screenshot.
+
 
 ## Why?
 My primary machine is an offline-first desktop with bandwidth restrictions. This utility lets me transfer Lynda.com courses downloaded with a laptop at my local library to my primary machine.
+
+## Warning!
+
+This software is a rough cut, and has been 'tested' on a single windows machine. It's probably a good idea to create a backup copy of your 'destination' folder before use.
+
+## A note to Lynda.com developers:
+
+It would be handy if the Lynda.com Desktop app checked the local disk before downloading video files. That way, users could move course files manually, and the app would only have to download meta-data and thumbnails.
