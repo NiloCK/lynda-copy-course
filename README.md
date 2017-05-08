@@ -6,7 +6,7 @@ A command line utility for copying downloaded Lynda.com courses from one machine
 
 ## Warning!
 
-This software is a rough cut, and has been 'tested' only on the auther's windows machine. It's probably a good idea to create a backup copy of your 'destination' folder before use.
+This software is a rough cut, and has been 'tested' only on the author's windows machine. It's probably a good idea to create a backup copy of your 'destination' folder before use.
 
 ## Installation
 
