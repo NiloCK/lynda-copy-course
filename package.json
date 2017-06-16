@@ -1,11 +1,12 @@
 {
   "name": "lynda-copy-course",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "A command-line utility for copying downloaded Lynda.com courses from one machine to another",
   "bin": {
     "lynda-copy-course": "./bin/lynda-copy-course.js"
   },
   "main": "./src/index.js",
+  "types": "./src/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
