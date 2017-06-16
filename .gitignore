@@ -3,3 +3,5 @@ src/*.js
 src/*.js.map
 bin/*.js
 bin/*.js.map
+bin/*.d.ts
+src/*.d.ts
