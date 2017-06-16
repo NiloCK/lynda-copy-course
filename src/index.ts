@@ -19,7 +19,7 @@ export class Course {
     }
 }
 
-class LyndaDirectory {
+export class LyndaDirectory {
     private ready: boolean = false;
     private directory: string;
     db: sqlite3.Database;
